@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import $ from 'jquery';
+import { Router, Route, Link } from 'react-router';
 
 class App extends Component {
 
@@ -352,7 +353,53 @@ class App extends Component {
                 );
             }
         });
-
+        var RepoList = React.createClass({
+         getInitialState: function() {
+             return { loading: true, error: null, data: null};
+         },
+         componentDidMount() {
+             this.props.promise.then(
+                 value => this.setState({loading: false, data: value}),
+                 error => this.setState({loading: false, error: error}));
+         },
+         render: function() {
+             if (this.state.loading) {
+                 return <span>Loading...</span>;
+             }
+             else if (this.state.error !== null) {
+                 return <span>Error: {this.state.error.message}</span>;
+             }
+             else {
+                 var repos = this.state.data.items;
+                 var repoList = repos.map(function (repo) {
+                     return (
+                         <li>
+                             <a href={repo.html_url}>{repo.name}</a> ({repo.stargazers_count} stars) <br/> {repo.description}
+                         </li>
+                     );
+                 });
+                 return (
+                     <main>
+                         <h1>Most Popular JavaScript Projects in Github</h1>
+                         <ol>{repoList}</ol>
+                     </main>
+                 );
+             }
+         }
+     });
+        var NotesList = React.createClass({
+          render: function() {
+              return (
+                  <ol>
+                      {
+                          React.Children.map(this.props.children, function (child) {
+                              return <li>{child}</li>;
+                          })
+                      }
+                  </ol>
+              );
+          }
+      });
         return (
             <div className="App">
                 <div className="App-header">
@@ -372,7 +419,21 @@ class App extends Component {
                 <HelloMessage1/>
                 <HelloMessage2/>
                 <MyComponent/>
+                <RepoList promise={$.getJSON('https://api.github.com/search/repositories?q=javascript&sort=stars')}/>
+                <NotesList>
+                    <span>hello</span>
+                    <span>world</span>
+                </NotesList>
                 <MyTitle title={title} customProp="matchme"/>
+                <Router>
+                    <Route path="/" component={WebSite}>
+                        <Route path="about" component={WebSite}/>
+                        <Route path="users" component={WebSite}>
+                            <Route path="/user/:userId" component={WebSite}/>
+                        </Route>
+                        <Route path="*" component={WebSite}/>
+                    </Route>
+                </Router>
             </div>
         );
     }
