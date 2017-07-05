@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import $ from 'jquery';
-import { Router, Route, Link } from 'react-router';
+import { Router, Route, Link,HashRouter } from 'react-router-dom';
 
 class App extends Component {
 
@@ -387,21 +387,13 @@ class App extends Component {
              }
          }
      });
-        var NotesList = React.createClass({
-          render: function() {
-              return (
-                  <ol>
-                      {
-                          React.Children.map(this.props.children, function (child) {
-                              return <li>{child}</li>;
-                          })
-                      }
-                  </ol>
-              );
-          }
-      });
         return (
             <div className="App">
+                <HashRouter>
+                    <Route exact path="/" component={MyTitle}/>
+                    <Route path="about" component={HelloMessage2}/>
+                    <Route path="users" component={RepoList}/>
+                </HashRouter>
                 <div className="App-header">
                     <img src={logo} className="App-logo" alt="logo"/>
                     <h2>Welcome to React</h2>
@@ -419,23 +411,28 @@ class App extends Component {
                 <HelloMessage1/>
                 <HelloMessage2/>
                 <MyComponent/>
-                <RepoList promise={$.getJSON('https://api.github.com/search/repositories?q=javascript&sort=stars')}/>
+                {/*<RepoList promise={$.getJSON('https://api.github.com/search/repositories?q=javascript&sort=stars')}/>*/}
                 <NotesList>
                     <span>hello</span>
                     <span>world</span>
                 </NotesList>
                 <MyTitle title={title} customProp="matchme"/>
-                <Router>
-                    <Route path="/" component={WebSite}>
-                        <Route path="about" component={WebSite}/>
-                        <Route path="users" component={WebSite}>
-                            <Route path="/user/:userId" component={WebSite}/>
-                        </Route>
-                        <Route path="*" component={WebSite}/>
-                    </Route>
-                </Router>
+
             </div>
         );
+        var NotesList = React.createClass({
+          render: function() {
+              return (
+                  <ol>
+                      {
+                          React.Children.map(this.props.children, function (child) {
+                              return <li>{child}</li>;
+                          })
+                      }
+                  </ol>
+              );
+          }
+      });
     }
 }
 
